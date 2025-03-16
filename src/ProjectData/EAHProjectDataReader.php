@@ -1,11 +1,16 @@
 <?php
+
+namespace App\ProjectData;
+
+use App\Database\InfluxDBClient;
+use DOMDocument;
+use DOMXPath;
+
 /**
  * Class EAHProjectDataReader
  *
  * This class is responsible for fetching and parsing project data from EinsteinAtHome.
  */
-require_once 'ProjectDataReader.php';
-
 class EAHProjectDataReader implements ProjectDataReader {
     /**
      * @var array Configuration array containing hosts and URL.

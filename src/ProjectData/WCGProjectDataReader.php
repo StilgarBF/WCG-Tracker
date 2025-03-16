@@ -1,11 +1,14 @@
 <?php
+
+namespace App\ProjectData;
+
+use App\Database\InfluxDBClient;
+
 /**
  * Class WCGProjectDataReader
  *
  * This class is responsible for fetching and parsing project data from the World Community Grid API.
  */
-require_once 'ProjectDataReader.php';
-
 class WCGProjectDataReader implements ProjectDataReader {
     /**
      * @var array $config Configuration array containing API credentials.

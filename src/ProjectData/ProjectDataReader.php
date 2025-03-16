@@ -1,5 +1,7 @@
 <?php
 
+namespace App\ProjectData;
+
 /**
  * Interface ProjectDataReader
  *

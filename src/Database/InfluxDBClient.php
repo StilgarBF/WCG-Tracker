@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Database;
+
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;

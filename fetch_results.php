@@ -1,12 +1,14 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+echo "<pre>";
 
 require 'vendor/autoload.php';
 require 'config.php';
-require 'InfluxDBClient.php';
-require 'WCGProjectDataReader.php';
-require 'EAHProjectDataReader.php';
+
+use App\Database\InfluxDBClient;
+use App\ProjectData\WCGProjectDataReader;
+use App\ProjectData\EAHProjectDataReader;
 
 global $influxDBClient;
 $influxDBClient = new InfluxDBClient($conf['influxDB']);
