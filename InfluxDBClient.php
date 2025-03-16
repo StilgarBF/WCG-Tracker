@@ -43,4 +43,3 @@ class InfluxDBClient {
         $this->writeApi->close();
     }
 }
-?>
