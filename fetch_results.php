@@ -4,28 +4,14 @@ ini_set('display_errors', 1);
 
 require 'vendor/autoload.php';
 require 'config.php';
+require 'InfluxDBClient.php';
 
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;
 
-$influxDB_host = $conf['influxDB']['host'];
-$influxDB_port = $conf['influxDB']['port'];
-$influxDB_org = $conf['influxDB']['org'];
-$influxDB_token = $conf['influxDB']['token'];
-$influxDB_bucket = $conf['influxDB']['bucket'];
-
-$client = new Client([
-    "url" => "http://{$influxDB_host}:{$influxDB_port}",
-    "token" => $influxDB_token,
-    "org" => $influxDB_org
-]);
-
-if (!$client) {
-    die("Failed to initialize InfluxDB client.\n");
-}
-
-$writeApi = $client->createWriteApi();
+global $influxDBClient;
+$influxDBClient = new InfluxDBClient($conf['influxDB']);
 
 /**
  * Fetch results from the given URL.
@@ -69,6 +55,7 @@ function fetchHtmlContent(string $url): string {
  * @param array $results The results to parse.
  */
 function parseWCGResults(array $results): void {
+    global $influxDBClient;
     foreach ($results['ResultsStatus']['Results'] as $result) {
         if ($result['GrantedCredit'] > 0) {
             $parsedResult = [
@@ -86,32 +73,9 @@ function parseWCGResults(array $results): void {
                 ],
                 'time' => strtotime($result['ReceivedTime'])
             ];
-            storeResult($parsedResult);
+            $influxDBClient->storeResult($parsedResult);
         }
     }
-}
-
-/**
- * Store a single result in InfluxDB.
- *
- * @param array $result The parsed result to store.
- */
-function storeResult(array $result): void {
-    global $writeApi, $influxDB_bucket;
-
-    $point = Point::measurement($result['measurement']);
-
-    foreach ($result['tags'] as $key => $value) {
-        $point->addTag($key, $value);
-    }
-
-    foreach ($result['fields'] as $key => $value) {
-        $point->addField($key, $value);
-    }
-
-    $point->time($result['time'], WritePrecision::S);
-
-    $writeApi->write($point, WritePrecision::S, $influxDB_bucket);
 }
 
 /**
@@ -187,6 +151,7 @@ function fetchAndParseEinsteinPage(string $url, string $hostName, bool $crawlPag
  * @param string $hostName The name of the host.
  */
 function parseEinsteinAtHomeResults(string $htmlContent, string $hostName): void {
+    global $influxDBClient;
     $dom = new DOMDocument();
     @$dom->loadHTML($htmlContent);
 
@@ -217,7 +182,7 @@ function parseEinsteinAtHomeResults(string $htmlContent, string $hostName): void
                 ],
                 'time' => strtotime($columns->item(2)->nodeValue)
             ];
-            storeResult($result);
+            $influxDBClient->storeResult($result);
         }
     }
 }
@@ -228,5 +193,5 @@ fetchWorldCommunityGrid($conf['wcg']);
 // Fetch and store results from Einstein@Home
 fetchEinsteinAtHome($conf['einstein']);
 
-$writeApi->close();
+$influxDBClient->close();
 ?>
