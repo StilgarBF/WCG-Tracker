@@ -92,7 +92,7 @@ class WCGProjectDataReader implements ProjectDataReader {
                     ],
                     'fields' => [
                         'ClaimedCredit' => (float)$result['ClaimedCredit'],
-                        'CpuTime' => (float)$result['CpuTime'],
+                        'CpuTime' => (float)$result['CpuTime'] * 3600,
                         'GrantedCredit' => (float)$result['GrantedCredit']
                     ],
                     'time' => strtotime($result['ReceivedTime'])
