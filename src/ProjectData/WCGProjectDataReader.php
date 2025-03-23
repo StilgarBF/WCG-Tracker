@@ -80,6 +80,9 @@ class WCGProjectDataReader implements ProjectDataReader {
      * @return void
      */
     private function parseResults(array $results): void {
+        $count = count($results['ResultsStatus']['Results']);
+        echo "Parsing {$count} results...\n";
+
         foreach ($results['ResultsStatus']['Results'] as $result) {
             if ($result['GrantedCredit'] > 0) {
                 $parsedResult = [
@@ -100,5 +103,7 @@ class WCGProjectDataReader implements ProjectDataReader {
                 $this->influxDBClient->storeResult($parsedResult);
             }
         }
+
+        echo "Strored {$count} results - {$this->influxDBClient->getCount()} total.\n";
     }
 }

@@ -9,6 +9,7 @@ use InfluxDB2\Point;
 class InfluxDBClient {
     private $writeApi;
     private $bucket;
+    private $count = 0;
 
     public function __construct(array $config) {
         $client = new Client([
@@ -39,9 +40,14 @@ class InfluxDBClient {
         $point->time($result['time'], WritePrecision::S);
 
         $this->writeApi->write($point, WritePrecision::S, $this->bucket);
+        $this->count++;
     }
 
     public function close(): void {
         $this->writeApi->close();
+    }
+
+    public function getCount(): int {
+        return $this->count;
     }
 }

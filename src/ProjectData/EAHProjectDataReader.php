@@ -110,6 +110,9 @@ class EAHProjectDataReader implements ProjectDataReader {
         $xpath = new DOMXPath($dom);
         $rows = $xpath->query("//table[contains(@class, 'sticky-enabled')]//tbody//tr");
 
+        $count = $rows->length;
+        $skipped = 0;
+
         foreach ($rows as $row) {
             $columns = $row->getElementsByTagName('td');
 
@@ -135,7 +138,11 @@ class EAHProjectDataReader implements ProjectDataReader {
                     'time' => strtotime($columns->item(2)->nodeValue)
                 ];
                 $this->influxDBClient->storeResult($result);
+            } else {
+                $skipped++;
             }
         }
+
+        echo "parsed {$count} result".($skipped ? " , {$skipped} skipped" : "")." - {$this->influxDBClient->getCount()} total.\n";
     }
 }
